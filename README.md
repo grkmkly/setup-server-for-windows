@@ -137,9 +137,154 @@ hostname -I
 komutunu kullanarak sanal makinein IP'sini öğrendik. Şimdi Windows cihazımıza geliyoruz.
 - Windows cihazımızdan bağlanmak için PowerShell'i kullanacağız. Eğer PowerShell yoksa veya kullanılamıyorusa Putty programını kullanarak SSH bağlantısını gerçekleştirebilir. Bu dökümantasyonda sadece PowerShell ile giriş açıklanacaktır. İnternetten kısa bir araştırmayla nasıl gireceğinizi öğrenebilirsiniz.
 - Powershell terminaline geldik. Şimdi bağlanmak için
+- **SSH bağlantısı ile bağlar.**
 ```bash
 ssh new_user@{ip adresi} -p 22
 ```
 komutunu kullanarak kullanıcı adınız farklı ise kullanıcı adınızı yazın. Şifrenizi girerek giriş yapabilirsiniz. Artık ssh ile giriş yapmış bulunmaktayız.
 ## SSH Key İle Kolay Giriş
-- Şimdi ssh keyimizi tanımlayarak şifre girmeden girebileceğiz.
+- Şimdi ssh keyimizi tanımlayarak şifre girmeden girebileceğiz ve başka bir bilgisayardan bağlantı sağlandığında onu direkt reddedecek.
+- Windows bilgisayarımızdan girişi sağlamıştık ve *.pub* dosyasındaki ssh keyimizi kopyalamıştık. Bu dosyayı yazacağımız dosyayı oluşturacağız.
+```bash
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+touch ~/.ssh/authorized_keys
+chmod 600 ~/.authorized_keys
+```
+komutlarını çalıştarak dosyamızı oluşturuyoruz ve izinlerini ayarlıyoruz. *mkdir* komutu klasör oluşturmak için kullanılıyor. *chmod* komutu dosya veya klasörler için kullanıcı ve grup için izinleri ayarlayan bir komuttur. 700 yaparak bizim kullandığımız kullanıcı için *.ssh* klasöründe okuma, yazma ve çalıştırma izni vermiştir. *touch* komutu yeni bir dosya oluşturmak için kullanılan bir komuttur. Touch komutu ile keylerimizi tutacağımız bir *.authorized_keys* dosyası oluşturduk. Sonrasında bu dosyanın iznini diğer kullanıcı ve gruplardan alarak sadece kendimiz için okuma,yazma izni vermek için *chmod* komutu ile 600 parametresini kullandık.
+- Şimdi ise o dosya içine bu ssh keyimizi yapıştıracağız. Bunun için
+```bash
+nano ~/.ssh/authorized_keys
+```
+komutunu kullanıyoruz ve bu *.pub* dosyası içindeki ssh keyimizi buraya kopyalayıp yapıştırıyoruz. Sonrasında çıkmak için **CTRL+X** tuşlarına basıyoruz. Sonrasında y tuşuna basıyoruz ve **ENTER** yaparak çıkış yapıyoruz. 
+- Şuan bizim bilgisayarımızı tanıyor fakat biz şifreyi kaldırmak istiyoruz ve root kullanıcısı ile ssh girişi istemiyoruz. Bunun için config dosyasındaki izinleri kaldıracağız.
+```bash
+sudo nano /etc/ssh/sshd_config
+```
+komutunu kullanarak config dosyasını açıyoruz. **CTRL+W** tuşlarına basarak aşağıdaki kelimeeleri aratarak bunları karşısındaki parametre ile değiştireceğiz ve eğer başında **#** işareti varsa kaldıracağız.
+```bash
+* PermitRootLogin no
+* PubKeyAuthentiation yes
+* AuthorizedKeysFile .ssh/authorized_keys
+* PasswordAuthentication no
+* UsePAM no
+```
+yerlerini bu şekilde değiştiriyoruz ve kaydediyoruz.(Daha önce söylendiği için bundan sonra söylemeyeceğiz.)
+- **SSH servisini sıfırlar.**
+```bash
+sudo systemctl restart ssh
+```
+komutunu kullanalım.
+- Şimdi Windows bilgisayarımızda deneyelim. Zaten bilgisayarımızda girmiştik. Bilgisayarımız ile girmiştik zaten ssh bağlantısını koparmak için
+```bash
+exit
+```
+komutunu kullanıyoruz ve tekrar ssh ile bağlantı yapmaya çalışınca(daha önce gösterilen şekilde) artık bağlantı direkt sağlanıyor. Ayrıca root kullanıcı ile giriş de iptal olmuş oldu. Eğer root ile bağlanmadığını görmek isterseniz sadece new_user tarafını root olarak değiştirebilirsiniz.
+
+## APACHE Web Server Kurulumu
+- Şimdi ise Apache kuracağız. Apache yaygın olarak kullanılan özgür, açık kaynak bir yazılımdır. Bu yazılım HTTP portu üzerinde çalışan bir web sayfalarını istemcilere dağıtmak için kullanılır.
+- **Apache'yi kurar.**
+```bash
+sudo apt update
+sudo apt install apache2 -y
+```
+komutlarını kullanarak Apache Web Serverini indirelim. İndirdikten sonra sistem her açıldığında başlatmak için 
+```bash
+sudo systemctl enable apache2
+```
+ve kontrol etmek için 
+```bash
+sudo systemctl status apache2
+```
+yapabiliriz.
+
+## Apache Konfigürasyonları
+- Aynı Ip adresini yönlendireceğim için Virtual Host olarak kullanmalıyım Apache'yi Bu Virtual hostları ayarlamak için
+```bash
+cd /etc/apache2/sites-available
+```
+komutunu kullanarak Apache'nin bazı konfig dosyalarının olduğu klasöre girdik. Burada her site için komutunu kullanıyoruz. Gördüğünüz üzere buğday.org.conf başka bir dosya oluşturduk. Türkçe karakter veya Çince gibi farklı karakterler kullanımı için PunyCode çevirimi yapmamız gerekiyor. Uyum açısından dolayı böyle bir şey yapmamız gerekmekteydi. PunyCode bu tarz karakterler için farklı bir kod oluşturan bir özelliktir. Biz bu özelliği kullandığımız için buğday.org.conf dosyasının punycode'u olaran *xn--buday-l1a.org.conf* ismini kullandık ve bu şekilde ilerleyeceğiz.
+```bash
+sudo nano 2025ozgur.com.conf
+sudo nano bugday.org.conf
+sudo nano xn--buday-l1a.org.conf
+```
+dosyalarını hem oluşturduk hem de içlerine
+**bugday.org.conf için**
+```plaintext
+<VirtualHost *:80>
+    ServerAdmin new_user@bugday.org
+    ServerName 192.168.1.106 # Buraya hostname -I ile oluşan IP'yi yazalım.
+    DocumentRoot /var/www/bugday.org/
+
+    <Directory /var/www/bugday.org/>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/example.com_error.log
+    CustomLog ${APACHE_LOG_DIR}/example.com_access.log combined
+</VirtualHost>
+```
+**buğday.org.conf için**
+```plaintext
+<VirtualHost *:80>
+    ServerAdmin new_user@bugday.org
+    ServerName 192.168.1.106 # Buraya hostname -I ile oluşan IP'yi yazalım.
+    DocumentRoot /var/www/bugday.org/
+
+    <Directory /var/www/bugday.org/>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/example.com_error.log
+    CustomLog ${APACHE_LOG_DIR}/example.com_access.log combined
+</VirtualHost>
+```
+**2025ozgur.com.conf için**
+```plaintext
+<VirtualHost *:80>
+    ServerAdmin new_user@2025ozgur.com
+    ServerName 2025ozgur.com
+    ServerAlias www.2025ozgur.com
+    DocumentRoot /var/www/2025ozgur.com/
+
+    <Directory /var/www/2025ozgur.com/yonetim>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/example.com_error.log
+    CustomLog ${APACHE_LOG_DIR}/example.com_access.log combined
+</VirtualHost>
+```
+yazalım. Config dosyalarımı oluşturduk. Şimdi ise bu config dosyalarının root klasörlerini oluşturacağız. Bunun için 
+```bash
+cd /var/www 
+```
+diyerek apachenin html dosyalarının olduğu yere geliyoruz. Burada bulunan html klasörünü silmek için 
+```bash
+sudo rm -rf html 
+```
+komutunu kullanıyoruz ve kaldırıyoruz. Kaldırdıktan sonra yeni root dosyalarını oluşturacağız.
+- **Klasör oluşturur**
+```bash
+sudo mkdir bugday.org
+sudo mkdir 2025ozgur.com
+```
+klasörlerini oluşturuyoruz. *bugday.org* ve *buğday.org* aynı Wordpress'e bağlanacağı için extra bir klasör oluşturmadık.
+- Apachenin yapılandırması bitti. Şimdi Apache yapılandırmasını sağlamk için
+```bash
+sudo a2ensite bugday.org.conf
+sudo a2ensite 2025ozgur.com.conf
+sudo a2ensite buğday.org.conf
+```
+komutlarını kullanıyoruz. Apache servisini tekrar başlatalım
+```bash
+sudo systemctl restart apache2
+```
+- Artık Apache'yi hem konfigüre ettik ve yapılandırdık. Şimdi Wordpress kurulumuna geçelim.
