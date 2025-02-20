@@ -42,22 +42,104 @@ sudo usermod -aG sudo new_user
 // new_user kullanıcısına yetki vermek için kullanıyoruz.
 ```
 bu komutu da uyguladıktan sonra artık new_user kullanıcısına geçebiliriz. Yeni kullanıcıya geçmek için 
+**su komutu kullanıcılar arası geçiş yapmak için kullanılır.**
 ```bash
 su new_user
-// su komutu kullanıcılar arası geçiş yapmak için kullanılır.
 ```
 bu komuttan sonra gelen şifre yerine şifremizi yazdıktan sonra artık bu kullanıcının yerine geçtik.
 - Şimdi Windows bilgisayarımızdan bağlanmak için *ssh* paketini indireceğiz. *ssh* paketi uzaktan bir bilgisayara ya da ağ içindeki bilgisayara bağlanmak için kullanılır. Biz windows bilgisayarımızdan başka bir bilgisayara bağlanmak için bu paketi kullanacağız. İndirmek için
+**Bu komut openssh-server paketini indirir ve kurar.**
 ```bash
 sudo apt install openssh-server -y
 ```
-komutunu kullanarak bilgisayarımıza indiriyoruz. Sonrasında aktif etmek için ;
+komutunu kullanarak bilgisayarımıza indiriyoruz. Sonrasında aktif etmek için 
+- **Bu komut sadece o anlık başlatır.**
 ```bash
-sudo systemctl start ssh // Bu sistemde sadece o anlık başlatır.
-sudo systecmtl enable ssh // Bu komutta her işletim sistemi açılışında otomatik çalışır.
+sudo systemctl start ssh
 ```
-komutu ile sistemi başlatıyoruz. Kontrol etmek istersek ;
+- **Bu komut ise her işletim sistemi açılışında otomatik çalıştırmak için kullanılır.**
+```bash
+sudo systecmtl enable ssh
+```
+- **Bu komut ssh durumunu kontrol eder.**
 ```bash
 sudo systemctl status ssh 
 ```
-komutuyla kontrol ediyoruz. Eğer Active kısmında active yanıyor ve yeşil ise başardık demektir. 
+komutuyla kontrol ediyoruz. Eğer Active kısmında **active** yanıyor ve yeşil ise başardık demektir. Şimdi ise makinemizi kapatmamız gerekiyor.
+**Makinemizi kapatmak için** 
+```bash
+sudo shutdown -h now
+```
+komutunu kullanıyoruz.
+## Virtual Box Konfigürasyonları
+- Kurulum yaparken Virtual Box Manager Network ayarlarını varsayılan ağ modunu NAT olarak ayarlar. NAT modu kurduğumuz sanal makinenin dış dünyaya çıkarken ki IP adresi host olan IP adresi ile aynı olur. Bu bizim HOST makinemizden sanal makinemize bağlanmamız için sanal makinenin de bir IP alması gerekir. Bunu sağlamak için bu sunucu serverin ağ ayarlarını Bridged Adaptor yapmamız gerekiyor. Bridged adapter modu bu sanal makineyi internete bağlarken bu makineyi sanal değil fiziksel olarak algılar ve o sunucuya bir IP verir. Bu IP'yi kullanarak ssh bağlantısı gerçekleştireceğiz. Aşağıda nasıl ağ ayarlarını değiştirmemiz gerektiği açıklanmaktadır. 
+- Sanal makinemize tıklayıp **Settings** kısmına geliyoruz ve Network kısmını buluyoruz. Gördüğünüz üzere varsayılan olarak **Attached to**(Bağlanma durumu) NAT yapılmış durumda bunu seçerek Bridged Adapter diyoruz. Zaten Wi-Fi kartını veya ethernet kartını da aşağıda otomatik tanımlıyor. Bu ayarı yaptıktan sonra **OK** tuşuna basıp kaydediyoruz ve sanal makineyi başlatıyoruz. Başlattıktan sonra yeni oluşturduğumuz *new_user* kullanıcısına giriş yapıyoruz.
+
+## SSH Bağlantısı
+- Öncelikle güvenlik önlemi için Firewall yazılımını açacağız. Varsayılan olarak kapalı gelir yine de kontrol edelim.
+- **Firewall durumunu kontrol eder.**
+```bash
+sudo ufw status
+```
+Eğer status olarak inactive yazıyorsa açmak için 
+- **Firewall'ı açar.**
+```bash
+sudo ufw enable 
+```
+bunun ardından gelen systemi tekrar başlatın uyarısından sonra 
+- **Sistemi yeniden başlatır.**
+```bash
+sudo reboot
+```
+komutunu kullanıyoruz. Bilgisayarımız açıldıktan sonra giriş yapıyoruz.
+- Şimdi ise genellikle SSH için kullanılan portumuz yani 22 portunu açacağız.
+- **Firewallda port izni vermek için** 
+```bash
+sudo ufw allow 22
+```
+komutunu girerek artık 22 portunu açmış bulunmaktayız kontrol etmek için 
+```bash
+sudo ufw status
+```
+yapıyoruz. Eğer 22 portu için action yerinde allow yazıyorsa başardık demektir.
+## SSH Key Oluşturma
+- Güvenlik için sadece bizim bilgisayar için bir kullılan bir ssh keyi oluşturacağız. Bir sonraki girişimiz için bizi tanıyacak ve ssh ile bağlantımız hem güvenli hem de kolay olacak.
+- Windows bilgisayarımızda **Başlat** tuşuna sağ tıklayarak terminal(admin) açıyoruz. ve terminal kısmına ssh-keygen yazıyoruz. Normal ismimiz kalsın o yüzden **ENTER** tuşuna basıyoruz. Extra bir şifreleme istiyorsanız passphrase kısmında bağlanırken kullanmanız için şifrenizi girebilirsiniz. Artık ssh-keyimiz oluşturuldu. Ssh keyimizi öğrenmek için ssh klasörüne gidelim.
+- **.ssh klasörüne girer.**
+```bash
+cd .ssh
+```
+komutunu kullanıyoruz.
+- **O klasör içindeki dosyaları listeler.**(PowerShell)
+```bash
+ls
+```
+- **O klasör içindeki dosyaları listeler.**(CMD)(Command Prompt)
+```bash
+dir
+```
+komutunu kullanarak hangi dosyalar olduğunu görelim. Orada bulunan .pub uzantılı dosya içinde bizim public ssh-keyimiz mevcut. Öğrenmek için
+- **Dosyayı okur.**(PowerShell)
+```bash
+cat {.pub uzantılı dosya ismi}
+```
+```bash
+type {.pub uzantılı dosya ismi}
+```
+diyerek o dosyanın içeriğini okuyoruz. Çıktı olarak gelen bu kodu kopyalayalım. Windows için işlemlerimiz bu kadar.
+
+## SSH Bağlantısı
+- Şimdi sanal makinemizin IP'sini öğrenerek bağlantı zamanı.
+- **Sanal makinenin IP'sini gösterir.**
+```bash
+hostname -I
+```
+komutunu kullanarak sanal makinein IP'sini öğrendik. Şimdi Windows cihazımıza geliyoruz.
+- Windows cihazımızdan bağlanmak için PowerShell'i kullanacağız. Eğer PowerShell yoksa veya kullanılamıyorusa Putty programını kullanarak SSH bağlantısını gerçekleştirebilir. Bu dökümantasyonda sadece PowerShell ile giriş açıklanacaktır. İnternetten kısa bir araştırmayla nasıl gireceğinizi öğrenebilirsiniz.
+- Powershell terminaline geldik. Şimdi bağlanmak için
+```bash
+ssh new_user@{ip adresi} -p 22
+```
+komutunu kullanarak kullanıcı adınız farklı ise kullanıcı adınızı yazın. Şifrenizi girerek giriş yapabilirsiniz. Artık ssh ile giriş yapmış bulunmaktayız.
+## SSH Key İle Kolay Giriş
+- Şimdi ssh keyimizi tanımlayarak şifre girmeden girebileceğiz.
