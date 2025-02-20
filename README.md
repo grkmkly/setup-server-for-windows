@@ -210,7 +210,7 @@ sudo nano bugday.org.conf
 sudo nano xn--buday-l1a.org.conf
 ```
 dosyalarını hem oluşturduk hem de içlerine
-**bugday.org.conf için**
+- **bugday.org.conf için**
 ```plaintext
 <VirtualHost *:80>
     ServerAdmin new_user@bugday.org
@@ -227,7 +227,7 @@ dosyalarını hem oluşturduk hem de içlerine
     CustomLog ${APACHE_LOG_DIR}/example.com_access.log combined
 </VirtualHost>
 ```
-**buğday.org.conf için**
+- **buğday.org.conf için**
 ```plaintext
 <VirtualHost *:80>
     ServerAdmin new_user@bugday.org
@@ -244,7 +244,7 @@ dosyalarını hem oluşturduk hem de içlerine
     CustomLog ${APACHE_LOG_DIR}/example.com_access.log combined
 </VirtualHost>
 ```
-**2025ozgur.com.conf için**
+- **2025ozgur.com.conf için**
 ```plaintext
 <VirtualHost *:80>
     ServerAdmin new_user@2025ozgur.com
