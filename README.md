@@ -5,9 +5,9 @@
 
 ## Virtual Box Üzerinden kurulum
 - Öncelikle kurulum için gerekli olan ISO dosyasını [Ubuntu Server LTS 24.0.1](https://ubuntu.com/download/server) linki üzerinden **Download LTS** butonuna tıklayarak indiriyoruz.
-- Virtual Box'ı açalım ve New seçeneğine tıklayalım. Tıkladığımız sekmede öncelikle name kısmına ne için kullanacaksak isim veriyoruz. Biz bu servera WebServer olarak kuracağımız için WebServer yazalım. ISO Image kısmında indirdiğimiz ISO dosyasını seçiyoruz ve *NEXT* tuşuna basarak ilerliyoruz.
-- Şimdi ki  gelen kısımda Username ve Password kısmını düzeltelim. Username kısmı için vboxuser kalabilir. Biz bu kurulum için kolaylık olması için vboxuser olarak bırakacağız. Password kısmındaki şifremizi değiştiriyoruz. Sağ kısımdaki Hostname kısmında boşluk olmamasına dikkat ediyoruz. Otomatik olarak gelen WebServer kalabilir.Sonrasında *NEXT* tuşuna basıyoruz.
-- Şimdiki kısım bilgisayarımızın bu kuracağımız işletim sistemi için ne kadar CPU çekirdeği ve RAM kullanacağını belirleyeceği kısımdır. Bu kısımda Ubuntu Server için 2048MB Base Memory ve 2 İşlemci Çekirdeği vermek genellikle yeterlidir. Eğer sisteminiz güçlüyse daha fazla verebilirsiniz. Bu adımı da ayarladıktan sonra tekrar *NEXT* tuşuna basıyoruz.
+- Virtual Box'ı açalım ve New seçeneğine tıklayalım. Tıkladığımız sekmede öncelikle Name kısmına ne için kullanacaksak bir isim veriyoruz. Biz bu sanal makineyi WebServer olarak kuracağımız için WebServer yazalım. ISO Image kısmında indirdiğimiz ISO dosyasını seçiyoruz ve *NEXT* tuşuna basarak ilerliyoruz.
+- Şimdi ki gelen kısımda Username ve Password kısmını düzeltelim. Username kısmı için vboxuser kalabilir. Biz bu kurulum için kolaylık olması için vboxuser olarak bırakacağız. Password kısmındaki şifremizi değiştiriyoruz. Sağ kısımdaki Hostname kısmındaki kelimenin arasında boşluk olmamasına dikkat ediyoruz. Otomatik olarak gelen WebServer kalabilir. Sonrasında *NEXT* tuşuna basıp ilerliyoruz.
+- Şimdiki kısım bilgisayarımızın bu kuracağımız işletim sistemi için ne kadar CPU çekirdeği ve RAM kullanacağını belirleyeceği kısımdır. Bu kısımda Ubuntu Server için 2048MB Base Memory ve 2 İşlemci Çekirdeği vermek genellikle yeterlidir. Eğer sisteminiz güçlüyse daha fazla verebilirsiniz. Bu adımı da ayarladıktan sonra tekrar *NEXT* tuşuna basıp bir sonraki kısma geçiyouz.
 - Bu gelen kısımda disk olarak ne kadar yer kaplayacağını söyleyeceğiz. Bu seçim tamamen size bağlıdır. Biz 25 GB seçerek ilerleyeceğiz. Çünkü içine yeteri kadar paket yüklemeyeceğiz. Bu bizim için yeterli. **Pre-Allocate Full Size** seçeneği sizin diskinizde o alanı direkt tahsis eder ve bu kullanmadığınız alanı da yiyeceği için pek tercih edilmez. Biz işaretlemeden geçeceğiz. Bu işlemi yaptıktan sonra tekrar *NEXT* tuşuna basarak ilerliyoruz.
 - Şimdiki ekranda seçtiğimiz şeyleri tekrar kontrol etmemiz için gösteriyor. Bu sayfada kontrol ettikten sonra *FINISH* tuşuna basıyoruz ve sonrasında açılacak olan WebServer adındaki Ubuntu Server'imi kurulmaya başlıyor. Kurulması için 5-10 dakika kadar bekliyoruz.
 
@@ -27,7 +27,7 @@ komutlarını girdikten sonra bize tekrar indirip indirmek istemediğimizi soruy
 ```bash
 sudo loadkeys tr
 ```
-komutunu kullanarak sistemdeki klavye düzenimizi Türkçe yapıyoruz. Eğer kalıcı olarak yapmak istersek :
+komutunu kullanarak sistemdeki klavye düzenimizi Türkçe yapıyoruz. **Eğer kalıcı olarak yapmak istersek :**
 - **nano komutu text dosyaları üzerinde işlem yapmamızı sağlar.**
 ```bash
 sudo nano /etc/default/keyboard
@@ -53,12 +53,8 @@ bu komuttan sonra gelen şifre yerine şifremizi yazdıktan sonra artık bu kull
 ```bash
 sudo apt install openssh-server -y
 ```
-komutunu kullanarak bilgisayarımıza indiriyoruz. **Sonrasında aktif etmek için :** 
-- **Bu komut sadece o anlık başlatır.**
-```bash
-sudo systemctl start ssh
-```
-- **Bu komut ise her işletim sistemi açılışında otomatik çalıştırmak için kullanılır.**
+komutunu kullanarak ssh servisini bilgisayarımıza indiriyoruz. **Sonrasında aktif etmek için :** 
+- **Bu komut ssh servisini hem başlatır hem de her işletim sistemi açılışında otomatik çalıştırmak için kullanılır.**
 ```bash
 sudo systecmtl enable ssh
 ```
@@ -73,7 +69,7 @@ sudo shutdown -h now
 ```
 komutunu kullanıyoruz.
 ## Virtual Box Konfigürasyonları
-- Kurulum yaparken Virtual Box Manager Network ayarlarındaki varsayılan ağ modunu NAT olarak ayarlar. NAT modu kurduğumuz sanal makinenin dış dünyaya çıkarken ki IP adresi host olan IP adresi ile aynı olur. Bu bizim HOST makinemizden sanal makinemize bağlanmamız için sanal makinenin de bir IP alması gerekir. Bunu sağlamak için bu sunucu serverin ağ ayarlarını Bridged Adaptor yapmamız gerekiyor. Bridged adapter modu bu sanal makineyi internete bağlarken bu makineyi sanal değil fiziksel olarak algılar ve o sunucuya bir IP verir. Bu IP'yi kullanarak ssh bağlantısı gerçekleştireceğiz. Aşağıda nasıl ağ ayarlarını değiştirmemiz gerektiği açıklanmaktadır. 
+- Kurulum yaparken Virtual Box Manager Network ayarlarındaki varsayılan ağ modunu NAT olarak ayarlar. NAT modu kurduğumuz sanal makinenin dış dünyaya çıkarken IP adresi host olan IP adresi ile aynı olur. Bu bizim HOST makinemizden sanal makinemize bağlanmamız için sanal makinenin de bir IP alması gerekir. Bunu sağlamak için bu sunucu serverin ağ ayarlarını Bridged Adaptor yapmamız gerekiyor. Bridged adapter modu bu sanal makineyi internete bağlarken bu makineyi sanal değil fiziksel olarak algılar ve o sunucuya bir IP verir. Bu IP'yi kullanarak ssh bağlantısı gerçekleştireceğiz. Aşağıda nasıl ağ ayarlarını değiştirmemiz gerektiği açıklanmaktadır. 
 - Sanal makinemize tıklayıp **Settings** kısmına geliyoruz ve Network kısmını buluyoruz. Gördüğünüz üzere varsayılan olarak **Attached to**(Bağlanma durumu) NAT yapılmış durumda bunu seçerek Bridged Adapter diyoruz. Zaten Wi-Fi kartını veya ethernet kartını da aşağıda otomatik tanımlıyor. Bu ayarı yaptıktan sonra **OK** tuşuna basıp kaydediyoruz ve sanal makineyi başlatıyoruz. Başlattıktan sonra yeni oluşturduğumuz *new_user* kullanıcısına giriş yapıyoruz.
 
 ## SSH Bağlantısı
@@ -104,9 +100,13 @@ sudo ufw status
 ```
 yapıyoruz. Eğer 22 portu için **action** kısmında **allow** yazıyorsa **BAŞARDIK** demektir.
 ## SSH Key Oluşturma
-- Öncelikle ssh 
-- Güvenlik için sadece bizim bilgisayar için kullanılan bir ssh keyi oluşturacağız. Bir sonraki girişimiz için bizi tanıyacak ve ssh ile bağlantımız hem güvenli hem de kolay olacak.
-- Windows bilgisayarımızda **Başlat** tuşuna sağ tıklayarak terminal(admin) açıyoruz. ve terminal kısmına ssh-keygen yazıyoruz. Normal ismimiz kalsın o yüzden **ENTER** tuşuna basıyoruz. Extra bir şifreleme istiyorsanız passphrase kısmında bağlanırken kullanmanız için şifrenizi girebilirsiniz. Artık ssh-keyimiz oluşturuldu. Ssh keyimizi öğrenmek için ssh klasörüne gidelim.
+- SSH Key'leri SSH protokolü kullılırken kullanılan bir şifreleme yöntemidir. SSH kullanılırken bu şifreleme yönteminde public keyler sunucuda saklanır ve SSH bağlantısında verilerini şifreler. Bu şifreyi sen sadece private key ile çözersin. Bu private key senin bilgisayarında saklanır ve bu sebeple bu veriyi sadece senin bilgisayarın çözebilir. Public ve Private keyler birlikte çalışır.
+- Güvenlik için biz de bu yönetmi kullanacağız ve bir ssh keyi oluşturacağız. Bu keyler bir sonraki girişimiz için bizi tanıyacak ve ssh ile bağlantımızı hem güvenli hem de kolay bir hale getirecek.
+- Windows bilgisayarımızda **Başlat** tuşuna sağ tıklayıp oradaki çıkan seçeneklerden terminal(admin) açıyoruz. ve terminale
+```bash
+ssh-keygen
+```
+yazıyoruz. Normal ismimizin kalmasını istediğimiz için **ENTER** tuşuna basarak ilerliyoruz. Extra bir şifreleme istiyorsanız passphrase kısmında bağlanırken kullanmanız için şifrenizi girebilirsiniz. Artık ssh-keyimiz oluşturuldu. Ssh keyimizi öğrenmek için ssh klasörüne gidelim.
 - **.ssh klasörüne girer.**
 ```bash
 cd .ssh
@@ -137,7 +137,7 @@ diyerek o dosyanın içeriğini okuyoruz. Çıktı olarak gelen bu kodu kopyalay
 hostname -I
 ```
 komutunu kullanarak sanal makinein IP'sini öğrendik. Şimdi Windows cihazımıza geliyoruz.
-- Windows cihazımızdan bağlanmak için PowerShell'i kullanacağız. Eğer PowerShell yoksa veya kullanılamıyorusa Putty programını kullanarak SSH bağlantısını gerçekleştirebilir. Bu dökümantasyonda sadece PowerShell ile giriş açıklanacaktır. İnternetten kısa bir araştırmayla nasıl gireceğinizi öğrenebilirsiniz.
+- Windows cihazımızdan bağlanmak için PowerShell'i kullanacağız. Eğer PowerShell yoksa veya kullanılamıyorusa Putty programını kullanarak SSH bağlantısını gerçekleştirebilir. Bu dökümantasyonda sadece PowerShell ile giriş açıklanacaktır. İnternetten kısa bir araştırmayla Putty ile nasıl gireceğinizi öğrenebilirsiniz.
 - Powershell terminaline geldik. Şimdi bağlanmak için
 - **SSH bağlantısı ile bağlar.**
 ```bash
@@ -163,13 +163,13 @@ komutunu kullanıyoruz ve bu *.pub* dosyası içindeki ssh keyimizi buraya kopya
 ```bash
 sudo nano /etc/ssh/sshd_config
 ```
-komutunu kullanarak config dosyasını açıyoruz. **CTRL+W** tuşlarına basarak aşağıdaki kelimeeleri aratarak bunları karşısındaki parametre ile değiştireceğiz ve eğer başında **#** işareti varsa kaldıracağız.
+komutunu kullanarak config dosyasını açıyoruz. **CTRL+W** tuşlarına basarak aşağıdaki ayarları aratarak bunları karşısındaki parametre ile değiştireceğiz ve eğer başında **#** işareti varsa kaldıracağız.
 ```bash
-PermitRootLogin no
-PubKeyAuthentiation yes
-AuthorizedKeysFile .ssh/authorized_keys
-PasswordAuthentication no
-UsePAM no
+PermitRootLogin no                          // Root Girişini engeller.
+PubKeyAuthentiation yes                     // Public key ile doğrualamayı açar.
+AuthorizedKeysFile .ssh/authorized_keys     // Oluşturduğumuz public keylerin yerini tanıtıyoruz.
+PasswordAuthentication no                   // Şfire ile girişi kaldırıyoruz.
+UsePAM no                                   // Şifreli girişleri kapatır.
 ```
 kısımları bu şekil olacak şekilde değiştiriyoruz ve kaydediyoruz.
 - **SSH servisini sıfırlar.**
@@ -183,7 +183,7 @@ exit
 ```
 komutunu kullanıyoruz ve tekrar ssh ile bağlantı yapmaya çalışınca(daha önce gösterilen şekilde) artık bağlantı direkt sağlanıyor. Ayrıca root kullanıcı ile giriş de iptal olmuş oldu. Eğer root ile bağlanmadığını görmek isterseniz sadece new_user kısmını root olarak değiştirebilirsiniz.
 
-## APACHE Web Server Kurulumu
+## Apache Web Server Kurulumu
 - Şimdi ise Apache kuracağız. Apache yaygın olarak kullanılan özgür, açık kaynak bir yazılımdır. Bu yazılım HTTP portu üzerinde çalışan bir web sayfalarını istemcilere dağıtmak için kullanılır.
 - **Apache'yi kurar.**
 ```bash
@@ -201,62 +201,52 @@ sudo systemctl status apache2
 ```
 komutlarını kullanabiliriz.
 ## Apache Konfigürasyonları
-- Aynı Ip adresini yönlendireceğim için Virtual Host olarak kullanmalıyım Apache'yi Bu Virtual hostları ayarlamak için
+- Aynı Ip adresini yönlendireceğim için Virtual Host olarak kullanmalıyım Apache'de bu Virtual hostları ayarlamak için
 ```bash
 cd /etc/apache2/sites-available
 ```
-komutunu kullanarak Apache'nin bazı config dosyalarının olduğu klasöre girdik. Burada her site için komutunu kullanıyoruz. Gördüğünüz üzere buğday.org.conf başka bir dosya oluşturduk. Türkçe karakter veya Çince gibi farklı karakterler kullanımı için PunyCode çevirimi yapmamız gerekiyor. Uyum açısından dolayı böyle bir şey yapmamız gerekmekteydi. PunyCode bu tarz karakterler için farklı bir kod oluşturan bir özelliktir. Biz bu özelliği kullandığımız için buğday.org.conf dosyasının punycode'u olaran *xn--buday-l1a.org.conf* ismini kullandık ve bu şekilde ilerleyeceğiz.
+komutunu kullanarak Apache'nin bazı config dosyalarının olduğu klasöre girdik. Burada her site için aşağıda bulunan komutunları kullanıyoruz. Gördüğünüz üzere buğday.org.conf dosyası için *.conf* dosyasının ismi buğday.org.conf değil. Bunun sebebi Türkçe karakter ve ya Çince gibi farklı karakterler kullanımı. Uyum açısı yüzünden bu site için PunyCode çevirimi yapmamız gerekiyor. PunyCode bu tarz karakterler için farklı bir kod oluşturan bir özelliktir. Biz bu özelliği kullandığımız için buğday.org.conf dosyasının Punycode'u olaran *xn--buday-l1a.org.conf* ismini kullandık ve bu şekilde ilerleyeceğiz.
 ```bash
 sudo nano 2025ozgur.com.conf
 sudo nano bugday.org.conf
 sudo nano xn--buday-l1a.org.conf
 ```
-dosyalarını hem oluşturduk hem de içlerine
+dosyalarını teker teker oluşturduk ve bu *.conf* uzantılı dosyalarını içeriğini
+
 - **bugday.org.conf için**
 ```plaintext
 <VirtualHost *:80>
-    ServerAdmin new_user@bugday.org
-    ServerName bugday.org
-    DocumentRoot /var/www/bugday.org/
+    ServerAdmin new_user@bugday.org                   // Bu sayfa adminin e- posta adresi herhangi bir hata durumunda mail gidecek.
+    ServerName bugday.org                             // Domain Name kısmı 
+    DocumentRoot /var/www/bugday.org/wordpress/        // Web sitesinin ana dizinini belirler.
 
-    <Directory /var/www/bugday.org/>
-        Options Indexes FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    ErrorLog ${APACHE_LOG_DIR}/example.com_error.log
-    CustomLog ${APACHE_LOG_DIR}/example.com_access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/example.com_error.log            // Hata loglarını kaydedecek dosyayı belirler.
+    CustomLog ${APACHE_LOG_DIR}/example.com_access.log combined            // Bu ziyaretçilerin erişim loglarını kaydedecek dosyayı belirler.
 </VirtualHost>
 ```
+
 - **buğday.org.conf için**
 ```plaintext
 <VirtualHost *:80>
     ServerAdmin new_user@xn--buday-l1a.org
     ServerName xn--buday-l1a.org
-    DocumentRoot /var/www/bugday.org/
-
-    <Directory /var/www/bugday.org/>
-        Options Indexes FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
+    DocumentRoot /var/www/bugday.org/wordpress/
 
     ErrorLog ${APACHE_LOG_DIR}/example.com_error.log
     CustomLog ${APACHE_LOG_DIR}/example.com_access.log combined
 </VirtualHost>
 ```
+
 - **2025ozgur.com.conf için**
 ```plaintext
 <VirtualHost *:80>
     ServerAdmin new_user@2025ozgur.com
     ServerName 2025ozgur.com
-    ServerAlias www.2025ozgur.com
+    ServerAlias www.2025ozgur.com        //Extra domainler belirler. Birden fazla olabilir.
     DocumentRoot /var/www/2025ozgur.com/
 
-    <Directory /var/www/2025ozgur.com/yonetim>
-        Options Indexes FollowSymLinks
-        AllowOverride AuthConfig
+    <Directory /var/www/2025ozgur.com/yonetim> 
+        AllowOverride AuthConfig             // yonetim dizini için şifreli bir giriş uygular.
         Require all granted
     </Directory>
 
@@ -264,11 +254,11 @@ dosyalarını hem oluşturduk hem de içlerine
     CustomLog ${APACHE_LOG_DIR}/example.com_access.log combined
 </VirtualHost>
 ```
-yazalım. Config dosyalarımı oluşturduk. Şimdi ise bu config dosyalarının root klasörlerini oluşturacağız. Bunun için 
+buradaki gibi değiştirdik. Konfigürasyon dosyalarımı oluşturduk. Şimdi ise bu konfigürasyon dosyalarının root klasörlerini oluşturacağız. Bunun için 
 ```bash
 cd /var/www 
 ```
-diyerek apachenin html dosyalarının olduğu yere geliyoruz. Burada bulunan html klasörünü silmek için 
+diyerek Apache'nin Web dosyalarının bulunduğu klasöre geliyoruz. Burada bulunan *html* klasörünü silmek istiyoruz. Bunun için 
 ```bash
 sudo rm -rf html 
 ```
@@ -278,20 +268,19 @@ komutunu kullanıyoruz ve kaldırıyoruz. Kaldırdıktan sonra yeni root dosyala
 sudo mkdir bugday.org
 sudo mkdir 2025ozgur.com && sudo mkdir 2025ozgur.com/yonetim
 ```
-klasörlerini oluşturuyoruz. *bugday.org* ve *buğday.org* aynı Wordpress'e bağlanacağı için extra bir klasör oluşturmadık.
-Apachenin yapılandırması bitti. 
-- **Şimdi Apache yapılandırmasını sağlamak için**
+klasörlerini oluşturuyoruz. *bugday.org* ve *buğday.org* aynı Wordpress'e bağlanacağı için extra bir klasör oluşturmadık. Apache'nin konfigürasyon dosyalarını ve Web klasörlerini oluşturduk. Şimdi 
+- **Apache'nin bu konfigürasyon dosyalarının yapılandırmasını sağlamak için**
 ```bash
 sudo a2ensite bugday.org.conf
 sudo a2ensite 2025ozgur.com.conf
 sudo a2ensite xn--buday-l1a.org.conf
 ```
-komutlarını kullanıyoruz. **Apache servisini tekrar başlatalım.**
+komutlarını kullanıyoruz.
+- **Apache servisini tekrar başlatalım.**
 ```bash
 sudo systemctl restart apache2
 ```
 - Artık Apache'yi hem konfigüre ettik ve yapılandırdık. Şimdi Veri Tabanı kurulumuna geçelim.
-
 ## Veri Tabanı Kurulumu
 - Öncelikle yapacağımız işlem yeni bir sanal makine daha oluşturmak. Bu sanal makine kurulumunu yukarıdak anlatıldığı şekilde yapalım. SSH bağlantısı için herhangi bir ayar yapmamıza gerek yok. Çünkü bu makineye SSH ile bir bağlantı sağlamayacağız. Yani extra SSH kurulumu yapmamıza gerek yoktur.
 - Bu sanal makinemizde veri tabanı oluşturacağız. Bu veri tabanını Wordpress için kullanacağız. Kullanacağımız veri tabanı MySql olacaktır. 
