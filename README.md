@@ -368,106 +368,57 @@ sudo a2enmod php8.3
 komutunu kullanarak Apache'nin php için uyumlu çalışmasını sağlayabiliriz.
 - Şimdi ise Wordpress'in kurulumuna geçelim. Kurulum yapacağımız klasöre giriş yapacağız ve bu klasörün içine Wordpress kurulumunu yapacağız. Bu Wordpress kurulumu yapacağımız klasör bugday.org olarak oluşturduğumuz klasör olacak. Bu klasöre geçiş yapmak için; 
 ```bash
-cd /var/www/bugday.org 
+cd /var/www/bugday.org && sudo mkdir wordpress && sudo chown -R www:data:www:data wordpress/
 ```
-komutunu kullanıyoruz. Şimdi Wordpress'in bulunduğu sıkıştırılmış dosyayı indireceğiz.
-- **Wordpress indirmek için**
-```bash
-sudo wget https://wordpress.org/latest.tar.gz
-```
-komutunu kullanıyoruz. *ls* komutunu kullanarak baktığımızda bir dosya var. Bu dosya sıkıştırılmış bir dosya ve sıkıştırılma türü olarak hem *tar* hem de *.gz* olan bu dosyayı buraya çıkartacağız.
-- **Sıkıştırılmış dosyayı çıkartmak için**
-```bash
-sudo tar -xvzf latest.tar.gz
-```
-komutunu kullanıyoruz. *ls* komutunu kullandığımızda bir wordpress klasörü ve bir de *latest.tar.gz* klasörü var. Bu tar klasörüyle işimiz kalmadığı için sileceğiz.
-```bash
-sudo rm -rf latest.tar.gz
-```
-komutunu kullanıyoruz. Şimdi izinleri ayarlayacağız. İzinleri ayarlamak için ;
-```bash
-sudo chown -R www-data:www-data /var/www/bugday.org
-```
-bu komut bugday.org adlı dizinin sahipliğini www-data sahipliği verir. Web sunucuları www-data kullanıcısını kullanır. Bu izin bu dosyalara bu Web sunucusunda ayar yapabilecek yetkideki kullanıcılara yetki verir. -R parametresi altındaki bütün dizinler için bunu geçerli hale getirir. 
+komutunu kullanıyoruz. Bu komut /bugday.org klasörü içinde wordpress adlı bir klasör oluşturur ve izinlerini ayarlar. Web sunucuları www-data kullanıcısını kullanır. Bu izin bu dosyalara bu Web sunucusunda ayar yapabilecek yetkideki kullanıcılara yetki verir. -R parametresi altındaki bütün dizinler için bunu geçerli hale getirir. Şimdi *wp-cli* uygulamasını indireceğiz.
 - Şimdi ise *wp-cli*'yi indireceğiz ve artık bütün işlemleri terminal üzerinden gerçekleştireceğiz. *wp-cli*'yi indirmek için (Bu indirmeyi wordpress klasörü içinde yaparsak daha garanti olur);
 ```bash
-sudo curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+cd /var/www/bugday.org/wordpress && sudo curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 ``` 
 komutunu kullanıyoruz. Bu *wp-cli* komutlarını her klasör içinde kullanabilmek için ;
 ```bash
 sudo chmod +x wp-cli.phar
 sudo mv wp-cli.phar /usr/local/bin/wp
 ```
-komutlarını kullanıyoruz.
+komutlarını kullanıyoruz. Bu komutların biri wp-cli.phar dosyasını çalıştırılabilir hale getirir ve /usr/local/bin klasörü içinde *wp* adlı bir dosyaya yazar. Şimdi Wordpress'in *wp-cli* ile kurulumunu sağlayacağız.
 ## Wordpress Konfigürasyonları
-- Bu bölümde Wordpress için konfigürasyonlarımızı yapacağız. Öncelikle *wp-config.php* dosyasını manuel oluşturacağız. Bu dosyayı oluşturmak için zaten bir örnek buluyor bu dosyayı kopyalacağız.
-- O dosyanın birebir kopyasını oluşturacağız.
-- **Dosyanın kopyasını oluşturmak için**
+- Şimdi *wp-cli* ile kuracağız. Bunun için ;
 ```bash
-sudo cp wp-config-sample.php wp-config.php
+wp core download
 ```
-komutunu kullanıyoruz. Bu komut ile yeni wp-config dosyası oluşturduk. Şimdi bu dosyada düzenlemelerde bulunacağız.
+komutunu kullanıyoruz. Bu komut Wordpress dosyalarını indirir. Şimdi konfigürasyon dosyasını oluşturacağız. Bunun için ;
 ```bash
-sudo nano wp-config.php
+wp config create --dbname=wordpress_db --dbuser=wp_user --dbpass=sifre --dbhost=Veri_tabanı_IP 
 ```
-komutunu kullanıyoruz. Buradaki 
-```plaintext
-define( 'DB_NAME', 'database_name_here' );
-define( 'DB_USER', 'username_here' );
-define( 'DB_PASSWORD', 'password_here' );
-define( 'DB_HOST', 'localhost' );
-define( 'DB_CHARSET', 'utf8' );
-```
-textlerini değiştireceğiz. Zaten belirtildiği üzere daha önce MySQL'de oluşturduğumuz sırasıyla database ismi, database kullanıcısı, database şifresi ve database'in IP'sini istiyor. Buradaki kısımları dolduruyoruz. Örnek olsun diye o kısmı benim olan şekilde paylaşıyorum.
-```plaintext
-define( 'DB_NAME', 'wordpres_db' );
-define( 'DB_USER', 'wp_user' );
-define( 'DB_PASSWORD', '' );         #Şifreniz
-define( 'DB_HOST', '' );    #hostname -I yaparak gelen IP adresi 
-define( 'DB_CHARSET', 'utf8mb4' );
-```
-yazdıktan sonra şu kısmı da siliyoruz. 
-```plaintext
-define( 'AUTH_KEY',         'put your unique phrase here' );
-define( 'SECURE_AUTH_KEY',  'put your unique phrase here' );
-define( 'LOGGED_IN_KEY',    'put your unique phrase here' );
-define( 'NONCE_KEY',        'put your unique phrase here' );
-define( 'AUTH_SALT',        'put your unique phrase here' );
-define( 'SECURE_AUTH_SALT', 'put your unique phrase here' );
-define( 'LOGGED_IN_SALT',   'put your unique phrase here' );
-define( 'NONCE_SALT',       'put your unique phrase here' );
-```
-Bu kısmın hepsini sildikten sonra kaydediyoruz.
-- Yukarıda belirttiğimiz sonu *_KEY* olarak biten kelimeler tekrar tekrar oturum yapmadan giriş yapmamızı sağlar. Sonu *_SALT* olarak bitenler ise şifrelenmiş verilerinize extra bir güvenlik katmanı sağlıyor. Bu keyleri wordpress apisinden isteyeceğiz ve *wp-config.php* içine yazacağız.Bunun için
+komutunu kullanarak uygun yerleri kendimiz dolduruyoruz. Konfigürasyon dosyasını oluşturduktan sonra artık Wordpress'i kuracağız. Bu kurulum için;
 ```bash
-curl -s "https://api.wordpress.org/secret-key/1.1/salt/" | sudo tee -a wp-config.php
+wp core install --url="bugday.org" --title="bugday.org" --admin_user="admin" --admin_password="admin_şifresi" --admin_email="mgk@bugday.org"
 ```
-komutunu kullanarak wordpress'in sitesinden keyleri çektik ve *wp-config.php* dosyasının içine yazdık.
-- Artık Wordpress'imizin kurulumu sağlandı. Denemek için verdiğiniz domain name girebilirsiniz.
+- Artık Wordpress'imizin kurulumu sağlandı. Apache'yi tekrardan başlatalım.
+```bash
+sudo systemctl restart apache2
+```
+- Denemek için verdiğiniz domain name adresine girebilirsiniz.
 ## wp-cli Kullanarak Post Atma
-- Öncelikle bugday.org klasörünün içine girelim. Klasörün içine girmek için ; 
-```bash
-cd  /var/www/bugday.org
-```
-komutunu kullanalım. Sonrasında buraya atacağımız posts için bir klasör oluşturalım. 
-```bash
-sudo mkdir posts
-```
-komutunu kullanalım ve posts içerisine girip bir txt dosyası oluşturup içine bir şeyler yazalım.
-```bash
-cd posts && sudo nano post1.txt
-```
-komutunu kullanalım ve içerisine paylaşacağımız yazıyı yazalım. Sonrasında kaydedip çıkalım. Sonrasında wordpress'klasörünün içine girelim.
+- Öncelikle *wordpress* klasörünün içine girelim. Klasörün içine girmek için ; 
 ```bash
 cd /var/www/bugday.org/wordpress
 ```
-komutunu kullanalım. *wordpress* klasöründe wp-cli özelliğini kullanarak post oluşturacağız.
+komutunu kullanalım. Sonrasında buraya atacağımız gönderiler için bir klasör oluşturalım. 
+```bash
+sudo mkdir wp-content/uploads/txt-files
+```
+komutunu kullanalım ve *txt-files* içerisine bir *.txt* dosyası oluşturalım ve içine yazılarımızı yazalım.
+```bash
+sudo nano wp-content/uploads/txt-files/post1.txt
+```
+komutunu kullanalım ve içerisine paylaşacağımız yazıyı yazalım. Sonrasında kaydedip çıkalım. Şimdi *wp-cli* kullanarak post oluşturacağız.
 - **Post oluşturmak için**
 ```bash
 wp post create --post_title="Wordpress Kurulumu" --post_content="$(cat /var/www/bugday.org/posts/post1.txt) --post_status=publish --post_author=1 --post_name="wordpress-kurulumu"
 ```
-komutunu kullanarak başlığı Wordpress Kurulumu, içeriği post1.txt dosyasında yazdığımız yazı, yayınlanmış, kullanıcısı 1'numaralı kullanıcı olan ve linkinin SEO uyumlu olması için konuyla alakalı olan bir post oluşturmuş olduk. Siz bunları değiştirerek kullanabilirsiniz. Artık postumuzu attık. Kontrol etmek için domain namemize girebiliriz. Postumuz burada gözükecek.
-- Postumuzu da oluşturduğumuza göre artık 2025ozgur.com adlı domain ismine geçebiliriz.
+komutunu kullanarak başlığı Wordpress Kurulumu, içeriği post1.txt dosyasında yazdığımız yazı, yayınlanmış, kullanıcısı 1'numaralı kullanıcı olan ve linkinin SEO uyumlu olması için konuyla alakalı olan bir post oluşturmuş olduk. Siz bunları değiştirerek kullanabilirsiniz. Artık postumuzu attık. Kontrol etmek için domain namemize girebiliriz. Postumuz ana sayfada gözükecek.
+- Postumuzu da oluşturduğumuza göre artık 2025ozgur.com adlı domain isminin ayarlamalarına geçebiliriz.
 ## 2025ozgur.com Sitesinin Oluşturulması
 - Daha 2025ozgur.com için klasörü önce oluşturmuştuk fakat herhangi bir site oluşturmamıştık. Siteyi oluşturmak için öncelikle o klasöre gitmemiz gerekiyor.
 ```bash
@@ -483,26 +434,26 @@ komutlarını kullanıyoruz ve Apache kimlik doğrulamasını açtık ve Apache 
 ```bash
 sudo htpasswd -c /etc/apache2/.htpasswd admin
 ```
-komutunu kullanıyoruz. *.htpasswd* dosyası Apache web sunucu için yetkilendirilecek kişilerin kullanıcı adı ve şifre bilgilerinin barındırıldığı dosyadır. Bu dosyaya bir *admin* adında bir kullanıcı ekledik. Bu komutu kullandıktan sonra bizden şifre isteyecek. *admin* kullanıcısı için şifremizi belirleyelim ve girelim.
+komutunu kullanıyoruz. *.htpasswd* dosyası Apache Web sunucusu için yetkilendirilecek kişilerin kullanıcı adı ve şifre bilgilerinin barındırıldığı dosyadır. Bu dosyaya bir *admin* adında bir kullanıcı ekledik. Bu komutu kullandıktan sonra bizden şifre isteyecek. *admin* kullanıcısı için şifremizi belirleyelim ve girelim.
 - Şimdi ise bu */yonetim* adlı klasöre erişim için *.htaccess* dosyası oluşturup düzenleyeceğiz. *.htaccess* dosyası herhangi bir web sunucusunun kullanıcı isteklerine nasıl yanıt vereceğini kontrol altına almaya yarayan bir dosyadır.
 - Şimdi bu dosyayı */yonetim* adlı klasörün içine oluşturalım ve oraya bir kimlik doğrulaması ekleyelim.
 - *htaccess* dosyasını oluşturalım.
 ```bash
-sudo nano /var/www/html/yonetim/.htaccess
+sudo nano /var/www/2025ozgur.com/yonetim/.htaccess
 ```
 komutunu kullanalım ve içine 
 ```plaintext
-AuthType Basic
-AuthName "yonetim"
-AuthUserFile /etc/apache2/.htpasswd
-Require valid-user
+AuthType Basic                //Doğruluma türünü belirler.
+AuthName "yonetim"            //Doğrulama ismini belirtir.
+AuthUserFile /etc/apache2/.htpasswd     //.paswd dosyasının yolunu belirledik. Biz buraya oluşturmuştuk.
+Require valid-user                    // Kullanıcı adı ve şifre ile giriş olacağını söyledik.
 ```
 textini ekleyelim. Bu ekleme işlemi */yonetim* klasörüne artık sadece .htpasswd içindeki kullanıcıların şifreleriyle birlikte girmesini sağlayacak. Bunu oluşturduktan sonra bu dosya içine bir *index.html* dosyası ekleyelim.
 - ***index.html* dosyasını oluşturur.**
 ```bash
 sudo nano /var/www/2025ozgur.com/yonetim/index.html
 ```
-sonrasında içine küçük bir html kodu ekleyelim.
+sonrasında içine küçük bir *html* kodu ekleyelim.
 ```html
 <!DOCTYPE html>
 <html lang="tr">
@@ -511,15 +462,14 @@ sonrasında içine küçük bir html kodu ekleyelim.
     <title>Basit HTML Sayfası</title>
 </head>
 <body>
-        <h1>Hoş Geldiniz!</h1>
-        <h2>Hakkında</h2>
+        <h1>Hoş Geldiniz Yonetim</h1>
         <p>Bu basit bir HTML sayfası örneğidir.</p>
 </body>
 </html>
 ```
-kodunu yapıştıralım. Bu kod küçük bir sayfa gösterir. Bu sayfaya sadece yonetimde olan insanlar erişebilir olacak.
+kodunu yapıştıralım. Bu kod basit bir *html* sayfası örneğidir. Bu sayfaya sadece yonetimde olan insanlar erişebilir olacak.
 - Şimdi kullanıcılar için bir *html* dosyası oluşturalım. Bu *html* dosyasına herkes ulaşabilir olacak. Bu *html* içinde 100 kere **Kullanıcılarımın kişisel verilerini toplamayacağım.** yazacak.
-- Öncelikle *html* dosyasını oluşturalım.
+- Öncelikle *html* dosyasını oluşturalım. Bu *html* dosyasını */yonetim* klasörü altına oluşturmayacağız.
 ```bash
 sudo nano /var/www/2025ozgur.com/index.html
 ```
@@ -545,4 +495,8 @@ komutunu kullanalım ve içine
 </html>
 ```
 kodunu yazalım. Bu koddaki *script* *div* etiketi içine 100 tane *p* etiketi oluştururken bu *p* etiketlerinin içine **Kullanıcılarımın kişisel verilerini toplamayacağım.** yazacak ve bu i değişkeniyle hepsini 1'den 100'e kadar sıralayacak.
-- Bununla birlikte görevlerimizin hepsini başarıyla tamamladık.
+- Şimdi Apache'mizi tekrar başlatalım.
+```bash
+sudo systemctl restart apacahe2
+```
+- Apache serverini tekrar başlatarak verilen bütün görevleri başarıyla gerçekleştirmiş olduk.Bu dökümantasyonda; Sanal makine kurulumu, herhangi bir sunucuya SSH bağlantısı sağlanarak nasıl ulaşacağımızı, SSH key ile güvenli bağlantıyı, Apache Web Server kurulumunu, bu Apache'yi nasıl konfigüre edeceğimizi, Apache Web Server'ine Wordpress kurulumunu, basit *wp-cli* komutlarını ve yönetim için olan url'lere nasıl kullanıcı adı ve şifre ile bağlanacağımızı öğrenmiş olduk. 
