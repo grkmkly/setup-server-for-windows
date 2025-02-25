@@ -68,7 +68,7 @@ komutuyla kontrol ediyoruz. Eğer Active kısmında **active** yanıyor ve yeşi
 sudo shutdown -h now
 ```
 komutunu kullanıyoruz.
-## Virtual Box Konfigürasyonları
+<h2 id="virtualbox">Virtual Box Konfigürasyonları</h2>
 - Kurulum yaparken Virtual Box Manager Network ayarlarındaki varsayılan ağ modunu NAT olarak ayarlar. NAT modu kurduğumuz sanal makinenin dış dünyaya çıkarken IP adresi host olan IP adresi ile aynı olur. Bu bizim HOST makinemizden sanal makinemize bağlanmamız için sanal makinenin de bir IP alması gerekir. Bunu sağlamak için bu sunucu serverin ağ ayarlarını Bridged Adaptor yapmamız gerekiyor. Bridged adapter modu bu sanal makineyi internete bağlarken bu makineyi sanal değil fiziksel olarak algılar ve o sunucuya bir IP verir. Bu IP'yi kullanarak ssh bağlantısı gerçekleştireceğiz. Aşağıda nasıl ağ ayarlarını değiştirmemiz gerektiği açıklanmaktadır. 
 - Sanal makinemize tıklayıp **Settings** kısmına geliyoruz ve Network kısmını buluyoruz. Gördüğünüz üzere varsayılan olarak **Attached to**(Bağlanma durumu) NAT yapılmış durumda bunu seçerek Bridged Adapter diyoruz. Zaten Wi-Fi kartını veya ethernet kartını da aşağıda otomatik tanımlıyor. Bu ayarı yaptıktan sonra **OK** tuşuna basıp kaydediyoruz ve sanal makineyi başlatıyoruz. Başlattıktan sonra yeni oluşturduğumuz *new_user* kullanıcısına giriş yapıyoruz.
 
@@ -268,7 +268,7 @@ komutunu kullanıyoruz ve kaldırıyoruz. Kaldırdıktan sonra yeni root dosyala
 sudo mkdir bugday.org
 sudo mkdir 2025ozgur.com && sudo mkdir 2025ozgur.com/yonetim
 ```
-klasörlerini oluşturuyoruz. *bugday.org* ve *buğday.org* aynı Wordpress'e bağlanacağı için extra bir klasör oluşturmadık. Apache'nin konfigürasyon dosyalarını ve Web klasörlerini oluşturduk. Şimdi 
+klasörlerini oluşturuyoruz. *bugday.org* ve *buğday.org* aynı Wordpress'e bağlanacağı için extra bir klasör oluşturmadık. Apache'nin konfigürasyon dosyalarını ve Web klasörlerini oluşturduk.
 - **Apache'nin bu konfigürasyon dosyalarının yapılandırmasını sağlamak için**
 ```bash
 sudo a2ensite bugday.org.conf
@@ -280,10 +280,10 @@ komutlarını kullanıyoruz.
 ```bash
 sudo systemctl restart apache2
 ```
-- Artık Apache'yi hem konfigüre ettik ve yapılandırdık. Şimdi Veri Tabanı kurulumuna geçelim.
+- Artık Apache'yi hem konfigüre ettik ve yapılandırdık. Şimdi veri tabanı kurulumuna geçelim.
 ## Veri Tabanı Kurulumu
-- Öncelikle yapacağımız işlem yeni bir sanal makine daha oluşturmak. Bu sanal makine kurulumunu yukarıdak anlatıldığı şekilde yapalım. SSH bağlantısı için herhangi bir ayar yapmamıza gerek yok. Çünkü bu makineye SSH ile bir bağlantı sağlamayacağız. Yani extra SSH kurulumu yapmamıza gerek yoktur.
-- Bu sanal makinemizde veri tabanı oluşturacağız. Bu veri tabanını Wordpress için kullanacağız. Kullanacağımız veri tabanı MySql olacaktır. 
+- Öncelikle yapacağımız işlem yeni bir sanal makine daha oluşturmaktır. Bu sanal makinenin kurulumunu yukarıdak anlatıldığı şekilde yapalım. [Virtual Box Konfigürasyonları](#virtualbox) kısmında belirtilen konfigürasyonları da yapmalıyız fakat SSH bağlantısı için herhangi bir ayar yapmamıza gerek yok. Çünkü bu makineye SSH ile bir bağlantı sağlamayacağız. Yani extra SSH kurulumu yapmamıza gerek yoktur.
+- Bu sanal makinemizde veri tabanı oluşturacağız. Bu veri tabanını Wordpress için kullanacağız. Kullanacağımız veri tabanı MySQL olacaktır. MySQL ilişkisel bir veri tabanı yönetim sistemidir.
 - **MySQL kurulumunu yapmak için** 
 ```bash
 sudo apt install mysql-server -y
@@ -293,14 +293,13 @@ komutunu kullanıyoruz ve mysql-server'i indiriyoruz.
 ```bash
 sudo systemctl enable mysql
 ```
-komutunu kullanıyoruz ve çalıştırıyoruz.
+komutunu kullanıyoruz ve çalıştırmaya başlıyoruz.
 ## MySQL Konfigürasyonları
-- Şimdi MySQL'e dışarıdan bir bağlantı açacağız ve diğer sunucudan bağlantısı için konfigürasyonunu yapacağız.
-
+- Şimdi MySQL'e dışarıdan bağlantı sağlamak için dışarıdan bağlantıyı açacağız ve diğer sunucudan bağlantısı için konfigürasyonunu yapacağız.
 ```bash
 sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
 ```
-komutunu kullanarak mysql için konfigüre edeceğimiz dosyayı açıyoruz. Bu dosya içinde aramak yapmak için **CTRL+W** kombinasyonunu kullanarak *bind-address* 'i bularak değeri aşağıda belirtildiği şekilde değiştiriyoruz. Bu değer MySQL serverine sadece host sunucudan değil diğer sunuculardan bağlanmamızı sağlayacak.
+komutunu kullanarak mysql için konfigüre edeceğimiz dosyayı açıyoruz. Bu dosya içinde aramak yapmak için **CTRL+W** kombinasyonunu kullanarak *bind-address* 'i bularak değeri aşağıda belirtildiği şekilde değiştiriyoruz. Normalde buluna değer sadece o sanal makine içinde bağlanmamızı sağlarken bu değiştirdiğimiz değer MySQL serverine sadece host sunucudan değil diğer sanal makineden de bağlanmamızı sağlayacak.
 ```plain text
 bind-address = 0.0.0.0
 ```
@@ -315,9 +314,8 @@ sudo ufw enable
 sudo ufw allow 3306
 sudo reboot
 ```
-komutlarını kullanarak FireWall yazılımını açtık. 3306 portuna izin verdik ve bilgisayarımızı yeniden başlattık.
+komutlarını kullanarak FireWall yazılımını açtık. 3306 portuna izin verdik ve bilgisayarımızı yeniden başlattık. Yeniden başladıktan sonra *new_user* kullanıcısıa geçiş yapalım.
 ## MySQL Database Oluşturma
-
 - Şuanki bölümde MySQL içinde Wordpress için bir database oluşturacağız. Öncelikle oluşturmak için MySQL' giriş yapmalıyız.
 ```bash
 sudo mysql
@@ -335,10 +333,9 @@ CREATE USER 'wp_user'(Kullanmak istediğiniz kullanıcı adı)@'%'(Bütün her y
 - **Bu veri tabanı üzerinde bu kullanıcıya yetki vermek için**
 ```bash
 GRANT ALL PRIVILEGES ON wordpress_db.* TO 'wp_user'@'%';
-
 FLUSH PRIVILEGES;
 ```
-komutlarını kullanıyoruz. Bu veri tabanıyla artık işimiz kalmadı. Artık MySQL terminalinden çıkış yapalım. 
+komutlarını kullanıyoruz. Bu MySQL ile artık işimiz kalmadı. Artık MySQL terminalinden çıkış yapalım. 
 - **Terminalden çıkış yapmak için**
 ```bash
 exit;
@@ -364,22 +361,22 @@ komutlarını kullanarak php ile Apache Web Serverini daha düzgün çalışmas�
 ```bash
 php -v 
 ```
-komutunu kullanarak versiyonunu öğrenelim. Bu öğrendiğimiz versiyon bu dökümantasyon yazılırken 8.3.6'dır. Bu versiyon için
+komutunu kullanarak versiyonunu öğrenelim. Bu dökümantasyon yazılırken php versiyonu 8.3.6'dır. Bu versiyon için
 ```bash
 sudo a2enmod php8.3
 ```
-komutunu kullanarak apachenin php için uyumlu çalışmasını sağlayabiliriz.
+komutunu kullanarak Apache'nin php için uyumlu çalışmasını sağlayabiliriz.
 - Şimdi ise Wordpress'in kurulumuna geçelim. Kurulum yapacağımız klasöre giriş yapacağız ve bu klasörün içine Wordpress kurulumunu yapacağız. Bu Wordpress kurulumu yapacağımız klasör bugday.org olarak oluşturduğumuz klasör olacak. Bu klasöre geçiş yapmak için; 
 ```bash
 cd /var/www/bugday.org 
 ```
-komutunu kullanıyoruz. Şimdi Wordpress'in bulunduğu sıkıştırılmış tar dosyasını indireceğiz.
+komutunu kullanıyoruz. Şimdi Wordpress'in bulunduğu sıkıştırılmış dosyayı indireceğiz.
 - **Wordpress indirmek için**
 ```bash
 sudo wget https://wordpress.org/latest.tar.gz
 ```
-komutunu kullanıyoruz. *ls* komutunu kullanarak baktığımızda bir dosya var. Bu dosya sıkıştırılmış bir dosya bu dosyayı buraya çıkartacağız.
-- **Tar dosyasını çıkartmak için**
+komutunu kullanıyoruz. *ls* komutunu kullanarak baktığımızda bir dosya var. Bu dosya sıkıştırılmış bir dosya ve sıkıştırılma türü olarak hem *tar* hem de *.gz* olan bu dosyayı buraya çıkartacağız.
+- **Sıkıştırılmış dosyayı çıkartmak için**
 ```bash
 sudo tar -xvzf latest.tar.gz
 ```
@@ -391,10 +388,10 @@ komutunu kullanıyoruz. Şimdi izinleri ayarlayacağız. İzinleri ayarlamak iç
 ```bash
 sudo chown -R www-data:www-data /var/www/bugday.org
 ```
-bu komut bugday.org adlı dizinin sahipliğini www-data sahipliği verir. Web sunucuları www-data kullanıcısını kullanır. Bu izin bu dosyalara bu Web sunucusunda ayar yapabilecek yetkideki kullanıclara yetki verir. -R parametresi altındaki bütün dizinler için bunu geçerli hale getirir. 
-- Şimdi ise *wp-cli*'yi indireceğiz ve artık bütün işlemleri terminal üzerinden gerçekleştireceğiz. *wp-cli*'yi indirmek için ;
+bu komut bugday.org adlı dizinin sahipliğini www-data sahipliği verir. Web sunucuları www-data kullanıcısını kullanır. Bu izin bu dosyalara bu Web sunucusunda ayar yapabilecek yetkideki kullanıcılara yetki verir. -R parametresi altındaki bütün dizinler için bunu geçerli hale getirir. 
+- Şimdi ise *wp-cli*'yi indireceğiz ve artık bütün işlemleri terminal üzerinden gerçekleştireceğiz. *wp-cli*'yi indirmek için (Bu indirmeyi wordpress klasörü içinde yaparsak daha garanti olur);
 ```bash
-curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+sudo curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 ``` 
 komutunu kullanıyoruz. Bu *wp-cli* komutlarını her klasör içinde kullanabilmek için ;
 ```bash
@@ -404,7 +401,8 @@ sudo mv wp-cli.phar /usr/local/bin/wp
 komutlarını kullanıyoruz.
 ## Wordpress Konfigürasyonları
 - Bu bölümde Wordpress için konfigürasyonlarımızı yapacağız. Öncelikle *wp-config.php* dosyasını manuel oluşturacağız. Bu dosyayı oluşturmak için zaten bir örnek buluyor bu dosyayı kopyalacağız.
-- O dosyanın birebir kopyasını oluşturacağız. Bunun için ;
+- O dosyanın birebir kopyasını oluşturacağız.
+- **Dosyanın kopyasını oluşturmak için**
 ```bash
 sudo cp wp-config-sample.php wp-config.php
 ```
