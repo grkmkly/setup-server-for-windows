@@ -1,4 +1,4 @@
-# setup-server for windows
+# Wordpress ve Apache Server Kurulumu
 ## Virtual Box Kurulumu
 - Öncelikle işletim sistemizi sanal olarak kullanmamız için bir sanal makine aracına ihtiyacımıza var. Virtual Box Manager bu iş için kullanılan açık kaynak bir programdır. **Bu programı kurmak için**
 - [Virtual Box Manager](https://www.virtualbox.org/wiki/Downloads) sitesinden Windows için olan son olan sürümünü indiriyoruz. Bu indirdiğimiz *.exe* dosyasını açıp hızlıca *NEXT* diyerek kuruyoruz.
@@ -89,10 +89,10 @@ bunun ardından gelen systemi tekrar başlatın uyarısından sonra
 sudo reboot
 ```
 komutunu kullanıyoruz. Bilgisayarımız açıldıktan sonra *new_user* kullanıcısına tekrar giriş yapıyoruz.
-- Şimdi ise genellikle SSH için kullanılan portumuz yani 22 portunu açacağız.
+- Şimdi ise genellikle SSH için kullanılan portumuz yani 22 portunu açacağız. Ayrıca MySQL girişi de sağlamak için 3306 portunu açacağız. Bir sonraki konularda anlatılmıştır.
 - **Firewallda port izni vermek için** 
 ```bash
-sudo ufw allow 22
+sudo ufw allow 22 && sudo ufw allow 3306
 ```
 komutunu girerek artık 22 portunu açmış bulunmaktayız. **Kontrol etmek için** 
 ```bash
