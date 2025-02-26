@@ -4,7 +4,7 @@
 - [Virtual Box Manager](https://www.virtualbox.org/wiki/Downloads) sitesinden Windows için olan son olan sürümünü indiriyoruz. Bu indirdiğimiz *.exe* dosyasını açıp hızlıca *NEXT* diyerek kuruyoruz.
 
 ## Virtual Box Üzerinden kurulum
-- Öncelikle kurulum için gerekli olan ISO dosyasını [Ubuntu Server LTS 24.0.1](https://ubuntu.com/download/server) linki üzerinden **Download LTS** butonuna tıklayarak indiriyoruz.
+- Kurulum için gerekli olan ISO dosyasını [Ubuntu Server LTS 24.0.1](https://ubuntu.com/download/server) linki üzerinden **Download LTS** butonuna tıklayarak indiriyoruz.
 - Virtual Box'ı açalım ve New seçeneğine tıklayalım. Tıkladığımız sekmede öncelikle Name kısmına ne için kullanacaksak bir isim veriyoruz. Biz bu sanal makineyi WebServer olarak kuracağımız için WebServer yazalım. ISO Image kısmında indirdiğimiz ISO dosyasını seçiyoruz ve *NEXT* tuşuna basarak ilerliyoruz.
 - Şimdi ki gelen kısımda Username ve Password kısmını düzeltelim. Username kısmı için vboxuser kalabilir. Biz bu kurulum için kolaylık olması için vboxuser olarak bırakacağız. Password kısmındaki şifremizi değiştiriyoruz. Sağ kısımdaki Hostname kısmındaki kelimenin arasında boşluk olmamasına dikkat ediyoruz. Otomatik olarak gelen WebServer kalabilir. Sonrasında *NEXT* tuşuna basıp ilerliyoruz.
 - Şimdiki kısım bilgisayarımızın bu kuracağımız işletim sistemi için ne kadar CPU çekirdeği ve RAM kullanacağını belirleyeceği kısımdır. Bu kısımda Ubuntu Server için 2048MB Base Memory ve 2 İşlemci Çekirdeği vermek genellikle yeterlidir. Eğer sisteminiz güçlüyse daha fazla verebilirsiniz. Bu adımı da ayarladıktan sonra tekrar *NEXT* tuşuna basıp bir sonraki kısma geçiyouz.
@@ -41,6 +41,10 @@ komutunu kullanarak user oluşturma yerine geliyoruz. Bu komutu girdikten sonra 
 - **new_user kullanıcısına sudo yetkisi verir.**
 ```bash
 sudo usermod -aG sudo new_user
+```
+ayrıca www-data grubuna da eklememiz gerekiyor. Bunun için ;
+```bash
+sudo usermodd -aG www-data new_user
 ```
 bu komutu da uyguladıktan sonra artık new_user kullanıcısına geçebiliriz. Yeni kullanıcıya geçmek için : 
 - **su komutu kullanıcılar arası geçiş yapmak için kullanılır.**
@@ -98,7 +102,7 @@ komutunu girerek artık 22 portunu açmış bulunmaktayız. **Kontrol etmek içi
 ```bash
 sudo ufw status
 ```
-yapıyoruz. Eğer 22 portu için **action** kısmında **allow** yazıyorsa **BAŞARDIK** demektir.
+yapıyoruz. Eğer 22 portu ve 3306 portu için **action** kısmında **allow** yazıyorsa **BAŞARDIK** demektir.
 ## SSH Key Oluşturma
 - SSH Key'leri SSH protokolü kullılırken kullanılan bir şifreleme yöntemidir. SSH kullanılırken bu şifreleme yönteminde public keyler sunucuda saklanır ve SSH bağlantısında verilerini şifreler. Bu şifreyi sen sadece private key ile çözersin. Bu private key senin bilgisayarında saklanır ve bu sebeple bu veriyi sadece senin bilgisayarın çözebilir. Public ve Private keyler birlikte çalışır.
 - Güvenlik için biz de bu yönetmi kullanacağız ve bir ssh keyi oluşturacağız. Bu keyler bir sonraki girişimiz için bizi tanıyacak ve ssh ile bağlantımızı hem güvenli hem de kolay bir hale getirecek.
@@ -263,12 +267,15 @@ diyerek Apache'nin Web dosyalarının bulunduğu klasöre geliyoruz. Burada bulu
 sudo rm -rf html 
 ```
 komutunu kullanıyoruz ve kaldırıyoruz. Kaldırdıktan sonra yeni root dosyalarını oluşturacağız.
-- **Klasör oluşturur**
+- **Klasör oluşturur ve izinlerini ayarlar.**
 ```bash
-sudo mkdir bugday.org
-sudo mkdir 2025ozgur.com && sudo mkdir 2025ozgur.com/yonetim
+sudo mkdir -m 775 bugday.org/ && 
+sudo chown -R www-data:www-data bugday.org/ && 
+sudo mkdir -m 775 2025ozgur.com/ && 
+sudo chown www-data:www-data 2025ozgur.com && 
+sudo mkdir -m 700 2025ozgur.com/yonetim
 ```
-klasörlerini oluşturuyoruz. *bugday.org* ve *buğday.org* aynı Wordpress'e bağlanacağı için extra bir klasör oluşturmadık. Apache'nin konfigürasyon dosyalarını ve Web klasörlerini oluşturduk.
+klasörlerini oluşturuyoruz ve izinlerini ayarlıyoruz. *bugday.org* ve *buğday.org* aynı Wordpress'e bağlanacağı için extra bir klasör oluşturmadık. Apache'nin konfigürasyon dosyalarını ve Web klasörlerini oluşturduk.
 - **Apache'nin bu konfigürasyon dosyalarının yapılandırmasını sağlamak için**
 ```bash
 sudo a2ensite bugday.org.conf
@@ -368,9 +375,9 @@ sudo a2enmod php8.3
 komutunu kullanarak Apache'nin php için uyumlu çalışmasını sağlayabiliriz.
 - Şimdi ise Wordpress'in kurulumuna geçelim. Kurulum yapacağımız klasöre giriş yapacağız ve bu klasörün içine Wordpress kurulumunu yapacağız. Bu Wordpress kurulumu yapacağımız klasör bugday.org olarak oluşturduğumuz klasör olacak. Bu klasöre geçiş yapmak için; 
 ```bash
-cd /var/www/bugday.org && sudo mkdir wordpress && sudo chown -R www:data:www:data wordpress/
+cd /var/www/bugday.org && sudo mkdir wordpress && sudo chown -R www-data:www-data wordpress/ && sudo chmod 770 wordpress/
 ```
-komutunu kullanıyoruz. Bu komut /bugday.org klasörü içinde wordpress adlı bir klasör oluşturur ve izinlerini ayarlar. Web sunucuları www-data kullanıcısını kullanır. Bu izin bu dosyalara bu Web sunucusunda ayar yapabilecek yetkideki kullanıcılara yetki verir. -R parametresi altındaki bütün dizinler için bunu geçerli hale getirir. Şimdi *wp-cli* uygulamasını indireceğiz.
+komutunu kullanıyoruz. Bu komut /bugday.org klasörü içinde wordpress adlı bir klasör oluşturur ve izinlerini ayarlar. Web sunucuları www-data kullanıcısını kullanır. Bu izin bu dosyalara bu Web sunucusunda ayar yapabilecek yetkideki kullanıcılara yetki verir. -R parametresi altındaki bütün dizinler için bunu geçerli hale getirir. Ayrıca oluşturan kullanıcı ve gruplar için okuma, yazma ve çalıştırma izni de vermiş olduk.
 - Şimdi ise *wp-cli*'yi indireceğiz ve artık bütün işlemleri terminal üzerinden gerçekleştireceğiz. *wp-cli*'yi indirmek için (Bu indirmeyi wordpress klasörü içinde yaparsak daha garanti olur);
 ```bash
 cd /var/www/bugday.org/wordpress && sudo curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
@@ -384,7 +391,7 @@ komutlarını kullanıyoruz. Bu komutların biri wp-cli.phar dosyasını çalı�
 ## Wordpress Konfigürasyonları
 - Şimdi *wp-cli* ile kuracağız. Bunun için ;
 ```bash
-wp core download
+cd /var/www/bugday.org/wordpress && wp core download
 ```
 komutunu kullanıyoruz. Bu komut Wordpress dosyalarını indirir. Şimdi konfigürasyon dosyasını oluşturacağız. Bunun için ;
 ```bash
